@@ -1,0 +1,411 @@
+/* ================================================================
+   style.css  —  Brain Blast! v2
+   Sections:
+     1.  Variables & Reset
+     2.  Background Decorations
+     3.  Welcome Screen
+     4.  Topbar
+     5.  App Shell & Level Badge
+     6.  Monkey Stage & Speech Bubble
+     7.  Timer Bar
+     8.  Puzzle Card & Category Stripes
+     9.  Answer Buttons
+    10.  Progress Report
+    11.  Effect Pieces (confetti, XP burst)
+    12.  Responsive
+================================================================ */
+
+/* ── 1. Variables & Reset ───────────────────────────────────── */
+:root {
+  --card:   #fffdf5;
+  --text:   #2d2d2d;
+  --shadow: 0 8px 30px rgba(60,40,10,.12);
+  --radius: 22px;
+  --btn-radius: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  background: linear-gradient(150deg, #ceeeff 0%, #fff9e0 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text);
+  transition: background .65s ease;
+}
+
+/* ── 2. Background Decorations ──────────────────────────────── */
+.deco {
+  position: fixed; pointer-events: none; z-index: 0;
+  animation: twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity: .18; transform: scale(1); }
+  50%      { opacity: .75; transform: scale(1.3); }
+}
+.leaf {
+  position: fixed; pointer-events: none; z-index: 0;
+  font-size: 1.5rem;
+  animation: leafSway 5s ease-in-out infinite alternate;
+}
+@keyframes leafSway {
+  from { transform: rotate(-13deg) translateY(0); }
+  to   { transform: rotate(13deg) translateY(-10px); }
+}
+
+/* ── 3. Welcome Screen ──────────────────────────────────────── */
+#welcome-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(150deg, #b3e8ff 0%, #ffeea0 100%);
+  padding: 24px;
+  animation: fadeIn .45s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+#wmon {
+  width: 185px; height: 185px;
+  margin-bottom: 14px;
+  animation: wFloat 2.8s ease-in-out infinite;
+  filter: drop-shadow(0 10px 20px rgba(100,50,0,.22));
+}
+@keyframes wFloat {
+  0%,100% { transform: translateY(0) rotate(-2.5deg); }
+  50%      { transform: translateY(-14px) rotate(2.5deg); }
+}
+
+.w-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2.4rem, 9vw, 4.4rem);
+  color: #6b2f00;
+  text-shadow: 3px 3px 0 #FFD93D, 5px 5px 0 rgba(255,140,0,.28);
+  line-height: 1; letter-spacing: 1px; margin-bottom: 4px;
+  animation: titlePop .7s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+@keyframes titlePop {
+  from { transform: scale(.5) rotate(-4deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.w-sub {
+  font-size: 1.05rem; font-weight: 700; color: #7a3800;
+  margin-bottom: 20px; opacity: 0;
+  animation: slideUp .5s ease .75s forwards;
+}
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.w-input {
+  background: #fff; border: 2.5px solid #f0c060;
+  border-radius: 50px; padding: 12px 22px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem; font-weight: 700; color: var(--text);
+  text-align: center; width: 100%; max-width: 280px;
+  outline: none; box-shadow: 0 4px 0 #d4a020;
+  transition: all .18s;
+}
+.w-input:focus {
+  border-color: #ff9f43; box-shadow: 0 4px 0 #c07810;
+  transform: scale(1.02);
+}
+.w-input::placeholder { color: #b8a070; font-weight: 600; }
+
+.w-btn {
+  margin-top: 16px;
+  background: linear-gradient(135deg, #ff9f43, #ff6060);
+  border: none; border-radius: 50px;
+  padding: 13px 44px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.2rem; font-weight: 900; color: #fff;
+  letter-spacing: .4px; cursor: pointer;
+  box-shadow: 0 6px 0 #c04020, 0 10px 26px rgba(220,80,0,.28);
+  transition: all .14s;
+  animation: pulsate 2.2s ease-in-out infinite;
+}
+.w-btn:hover  { transform: translateY(-3px); box-shadow: 0 9px 0 #c04020; }
+.w-btn:active { transform: translateY(3px);  box-shadow: 0 3px 0 #c04020; }
+@keyframes pulsate {
+  0%,100% { filter: brightness(1); }
+  50%      { filter: brightness(1.07); }
+}
+
+.w-badges {
+  display: flex; gap: 7px; margin-top: 14px;
+  flex-wrap: wrap; justify-content: center;
+  max-width: 420px;
+}
+.w-badge {
+  background: rgba(255,255,255,.68); border-radius: 50px;
+  padding: 5px 12px; font-size: .8rem; font-weight: 700;
+  border: 2px solid rgba(255,255,255,.48); color: #6b3800;
+  backdrop-filter: blur(4px);
+}
+
+/* ── 4. Topbar ──────────────────────────────────────────────── */
+#topbar {
+  position: relative; z-index: 10;
+  background: linear-gradient(90deg, #5a2800, #9a4a18);
+  padding: 9px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 3px 16px rgba(60,20,0,.26);
+}
+.logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.45rem; color: #FFD93D;
+  letter-spacing: 1.5px; text-shadow: 2px 2px 0 #3a1500;
+}
+.pname { color: #ffd890; font-size: .8rem; font-weight: 700; margin-top: 1px; }
+.chips { display: flex; gap: 7px; }
+.chip {
+  background: rgba(255,255,255,.14);
+  border: 1.5px solid rgba(255,255,255,.22);
+  border-radius: 50px; padding: 5px 13px;
+  color: #fff; font-size: .88rem; font-weight: 800;
+  display: flex; align-items: center; gap: 5px;
+}
+.chip.pop { animation: chipBounce .38s cubic-bezier(.36,.07,.19,.97); }
+@keyframes chipBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.38); }
+  100% { transform: scale(1); }
+}
+
+/* ── 5. App Shell & Level Badge ─────────────────────────────── */
+#app {
+  display: none; max-width: 540px;
+  margin: 0 auto; padding: 12px 13px 90px;
+  position: relative; z-index: 5;
+}
+#lvl { text-align: center; margin: 10px 0 4px; }
+#lvl span {
+  font-family: 'Fredoka One', cursive;
+  font-size: .92rem;
+  background: linear-gradient(135deg, #FFD93D, #ff9f43);
+  color: #6b2f00; padding: 4px 18px;
+  border-radius: 50px; box-shadow: 0 3px 0 #b87010;
+  letter-spacing: .5px;
+}
+
+/* ── 6. Monkey Stage & Speech Bubble ────────────────────────── */
+#monkey-stage {
+  display: flex; justify-content: center; align-items: flex-end;
+  height: 210px; margin: 8px 0 0; position: relative;
+}
+#monkey-stage::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 15%; right: 15%; height: 18px;
+  background: radial-gradient(ellipse at 50% 100%,
+    rgba(80,40,0,.2) 0%, transparent 72%);
+  border-radius: 50%;
+}
+#monkey-stage canvas { display: block; margin: 0 auto; position: relative; z-index: 2; }
+
+#speech {
+  position: absolute; top: 5px; right: calc(50% - 134px);
+  background: #fff; border: 2.5px solid #f0c060;
+  border-radius: 15px 15px 15px 3px;
+  padding: 7px 13px;
+  font-family: 'Nunito', sans-serif;
+  font-size: .92rem; font-weight: 700; color: #6b2f00;
+  white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,.09);
+  opacity: 0; transform: scale(.8) translateY(10px);
+  transition: all .26s cubic-bezier(.22,1,.36,1);
+  pointer-events: none; z-index: 10;
+}
+#speech.show { opacity: 1; transform: scale(1) translateY(0); }
+#speech::after {
+  content: ''; position: absolute;
+  bottom: -13px; left: 13px;
+  border: 6px solid transparent;
+  border-top-color: #f0c060;
+}
+#speech::before {
+  content: ''; position: absolute;
+  bottom: -9px; left: 14px;
+  border: 5px solid transparent;
+  border-top-color: #fff; z-index: 1;
+}
+
+/* ── 7. Timer Bar ───────────────────────────────────────────── */
+#timer-wrap {
+  background: #e4ddd0; border-radius: 50px;
+  height: 9px; margin: 11px 0 2px; overflow: hidden;
+}
+#timer-bar {
+  height: 100%; border-radius: 50px;
+  background: linear-gradient(90deg, #5ecb6e, #FFD93D, #FF6B6B);
+  width: 100%; transition: width .1s linear;
+}
+
+/* ── 8. Puzzle Card & Category Stripes ──────────────────────── */
+.puzzle-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px 16px 18px;
+  box-shadow: var(--shadow);
+  border: 2px solid #f0e8d8;
+  animation: cardSlide .4s cubic-bezier(.22,1,.36,1);
+  position: relative; overflow: hidden; margin-top: 10px;
+}
+.puzzle-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 6px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+/* One stripe per category */
+.puzzle-card.math::before       { background: linear-gradient(90deg,#FFD93D,#ff9f43); }
+.puzzle-card.logic::before      { background: linear-gradient(90deg,#b97dff,#5b7fff); }
+.puzzle-card.pattern::before    { background: linear-gradient(90deg,#4da6ff,#00c6ff); }
+.puzzle-card.story::before      { background: linear-gradient(90deg,#5ecb6e,#78d6f7); }
+.puzzle-card.visual::before     { background: linear-gradient(90deg,#ff9966,#ff5e62); }
+.puzzle-card.memory::before     { background: linear-gradient(90deg,#cc66ff,#8844cc); }
+.puzzle-card.speed::before      { background: linear-gradient(90deg,#FFD93D,#ff6b6b); }
+.puzzle-card.comparison::before { background: linear-gradient(90deg,#00ccaa,#0088cc); }
+.puzzle-card.sequence::before   { background: linear-gradient(90deg,#66cc44,#44aa22); }
+.puzzle-card.word::before       { background: linear-gradient(90deg,#2ecc8a,#00e5aa); }
+.puzzle-card.animals::before    { background: linear-gradient(90deg,#ff9966,#cc6600); }
+.puzzle-card.colors::before     { background: linear-gradient(90deg,#ff6699,#cc0044); }
+.puzzle-card.shapes::before     { background: linear-gradient(90deg,#4466ff,#0022cc); }
+.puzzle-card.trick::before      { background: linear-gradient(90deg,#aa44ff,#6600cc); }
+.puzzle-card.emotional::before  { background: linear-gradient(90deg,#FF6B6B,#ff9f43); }
+
+@keyframes cardSlide {
+  from { opacity: 0; transform: translateY(34px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 15px; border-radius: 50px;
+  font-size: .86rem; font-weight: 800; letter-spacing: .3px;
+  margin-bottom: 12px; border: 2px solid currentColor;
+  box-shadow: 0 2px 7px rgba(0,0,0,.07);
+}
+
+/* Question text */
+.puzzle-q {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1.05rem, 3.8vw, 1.5rem);
+  font-weight: 800; color: #1a1a1a;
+  line-height: 1.4; margin-bottom: 16px;
+  text-align: center; min-height: 50px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── 9. Answer Buttons ──────────────────────────────────────── */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts.c3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.opt {
+  background: #f8f3e8;
+  border: 2.5px solid #e0d4b8; border-radius: var(--btn-radius);
+  padding: 13px 9px;
+  font-family: 'Nunito', sans-serif;
+  font-size: .98rem; font-weight: 700; color: #3a2a10;
+  cursor: pointer;
+  transition: all .14s cubic-bezier(.22,1,.36,1);
+  box-shadow: 0 4px 0 #ccc0a0;
+  user-select: none; line-height: 1.3;
+}
+.opt:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 0 #bab090;
+  border-color: #c8b870; background: #fff7e8;
+}
+.opt:active:not(:disabled) {
+  transform: translateY(2px) scale(.97);
+  box-shadow: 0 2px 0 #bab090;
+}
+.opt.correct {
+  background: #e4f9ec; border-color: #5ecb6e;
+  box-shadow: 0 4px 0 #38a050; color: #1a5c30;
+  animation: correctPop .42s cubic-bezier(.36,.07,.19,.97);
+}
+.opt.wrong {
+  background: #fce6e6; border-color: #FF6B6B;
+  box-shadow: 0 4px 0 #c03030; color: #7a1010;
+  animation: wrongShake .38s ease;
+}
+.opt:disabled { cursor: default; opacity: .96; }
+
+@keyframes correctPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.1); }
+  65% { transform: scale(.97); }
+  100% { transform: scale(1); }
+}
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0); }
+  22% { transform: translateX(-7px); }
+  44% { transform: translateX(7px); }
+  66% { transform: translateX(-4px); }
+  88% { transform: translateX(4px); }
+}
+
+#feedback {
+  margin-top: 13px; text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem; font-weight: 800; min-height: 28px;
+}
+
+/* ── 10. Progress Report ────────────────────────────────────── */
+#report-section {
+  margin-top: 15px; background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 15px 13px;
+  box-shadow: var(--shadow); border: 2px solid #f0e8d8;
+}
+#report-section h3 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem; color: #6b2f00; margin-bottom: 11px;
+}
+.srow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.sico { font-size: 1.05rem; }
+.slbl { font-weight: 800; font-size: .82rem; width: 58px; color: #6b2f00; }
+.sbar-wrap {
+  flex: 1; background: #ede4d0;
+  border-radius: 50px; height: 11px; overflow: hidden;
+}
+.sbar {
+  height: 100%; border-radius: 50px;
+  transition: width .65s cubic-bezier(.22,1,.36,1);
+}
+.snums { font-size: .74rem; font-weight: 800; color: #999; white-space: nowrap; }
+
+/* ── 11. Effect Pieces ──────────────────────────────────────── */
+.xp-pop {
+  position: fixed; pointer-events: none;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.65rem; color: #FFD93D;
+  text-shadow: 0 2px 8px rgba(0,0,0,.22);
+  z-index: 999; animation: xpUp .95s ease forwards;
+}
+@keyframes xpUp {
+  from { opacity: 1; transform: translateY(0) scale(.7); }
+  to   { opacity: 0; transform: translateY(-82px) scale(1.25); }
+}
+.conf {
+  position: fixed; pointer-events: none;
+  z-index: 998; animation: confFall ease-out forwards;
+}
+@keyframes confFall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+  100% { opacity: 0; transform: translateY(148px) rotate(480deg) scale(.5); }
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); border: 0;
+}
+
+/* ── 12. Responsive ─────────────────────────────────────────── */
+@media (max-width: 420px) {
+  .puzzle-q { font-size: 1rem; }
+  .opt      { font-size: .88rem; padding: 11px 6px; }
+  #monkey-stage canvas { width: 205px !important; height: auto !important; }
+  .w-badge  { font-size: .74rem; padding: 5px 10px; }
+}
